@@ -1,0 +1,105 @@
+name: Create and Push Docker Image
+on:
+  workflow_dispatch
+  
+jobs:
+  build-an-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v1
+
+      - name: Build Docker image
+        run: docker build -t quay.io/ccsportal/continuous-monitoring-ui:first_image .
+
+      - name: Log in to Quay.io
+        run: docker login -u ${{ secrets.CCS_QUAY_CCSPORTAL_BUILDER }} -p ${{ secrets.CCS_QUAY_CCSPORTAL_BUILDER_PASSWORD }} quay.io
+
+      - name: Push Docker image to Quay.io
+        run: docker push quay.io/ccsportal/continuous-monitoring-ui:first_image
+  
+  
+  
+  # Docker_APP_Build_Without_FIPS:
+  #   needs: Git_Tag
+  #   runs-on: ubuntu-latest
+  #   name: Create and push Application container for without fips
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v2
+
+  #     - name: Docker Push
+  #       uses: glcp/ccs-automation/ci_cd_commons/docker_build_push/app@v2
+  #       with:
+  #           appname: ${{ env.APP_NAME }}
+  #           appid: ${{ env.APP_ID }}
+  #           tag: ${{ needs.Git_Tag.outputs.tag }}
+
+  #           registry: quay.io
+  #           quay_username: ${{ env.quay_username }}
+  #           quay_password: ${{ env.quay_password }}
+  #           image_registry: ${{ env.image_registry }}
+  #           jfrog_username: ${{ env.jfrog_username }}
+  #           jfrog_password: ${{ env.jfrog_password }}
+  #           gh_token: ${{ env.gh_token }}
+  #           base_image: ${{ env.BASE_IMAGE }}
+
+  #   outputs:
+  #     tag: ${{ needs.Git_Tag.outputs.tag }}
+
+
+# name: Building docker app image for continuous manitoring ui
+
+# on:
+#   workflow_dispatch:
+#     branches:
+#       - ui_aayush
+
+# env:
+#   IMAGE_REGISTRY: quay.io/ccsportal/continuous-monitoring-ui 
+#   registry: quay.io
+#   quay_username: ${{ secrets.CCS_QUAY_CCSPORTAL_BUILDER }}
+#   quay_password: ${{ secrets.CCS_QUAY_CCSPORTAL_BUILDER_PASSWORD }}
+#   gh_token: ${{ secrets.GLCP_GH_TOKEN }}
+
+# jobs:
+
+#   Git_Tag:
+#     runs-on: ubuntu-latest
+#     name: Create and update new git tag test
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v2
+
+#       - name: Git Tag
+#         uses: glcp/ccs-automation/ci_cd_commons/tag_git_new@v3
+#         id: new-tag
+#         with:
+#           version: ${{ env.version }}
+
+#     outputs:
+#       tag: ${{ steps.new-tag.outputs.gittag }}
+  
+#   Docker_APP_Build:
+#     needs: Git_Tag
+#     runs-on: ubuntu-latest
+#     name: Create and push Application container for without fips
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v2
+
+#       - name: Docker Push
+#         uses: glcp/ccs-automation/ci_cd_commons/docker_build_push/app@v2
+#         with:
+#             tag: ${{ needs.Git_Tag.outputs.tag }}
+#             registry: quay.io
+#             quay_username: ${{ env.quay_username }}
+#             quay_password: ${{ env.quay_password }}
+#             image_registry: ${{ env.image_registry }}
+#             gh_token: ${{ env.gh_token }}
+#     outputs:
+#       tag: ${{ needs.Git_Tag.outputs.tag }}
